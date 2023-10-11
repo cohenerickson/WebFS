@@ -1,0 +1,26 @@
+{
+  "name": "webfs",
+  "description": "Virtual file system for the browser.",
+  "version": "0.0.1",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsx ./build.ts && tsc --emitDeclarationOnly --outFile ./dist/index.d.ts",
+    "dev": "tsx ./build.ts --development",
+    "pretty": "prettier --write ."
+  },
+  "dependencies": {
+    "events": "^3.3.0",
+    "idb": "^7.1.1",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@trivago/prettier-plugin-sort-imports": "^4.2.0",
+    "@types/node": "^20.8.4",
+    "esbuild": "^0.19.4",
+    "tsx": "^3.13.0",
+    "typescript": "^5.2.2"
+  }
+}

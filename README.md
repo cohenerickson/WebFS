@@ -1,2 +1,3 @@
 # WebFS
-VFS for the browser.
+
+Virtual file system for the browser.
