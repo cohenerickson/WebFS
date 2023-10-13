@@ -32,9 +32,13 @@ export async function mkdir(
     accessed: new Date()
   };
 
-  const parent = (await this.provider.findEntry(
-    path.dirname(path.join(this.cwd, filePath))
-  )) as Directory;
+  const parentPath = path.dirname(path.join(this.cwd, filePath));
+  let parent = (await this.provider.findEntry(parentPath)) as Directory;
+
+  if (!parent && options?.recursive) {
+    await this.mkdir(path.dirname(parentPath), options);
+    parent = (await this.provider.findEntry(parentPath)) as Directory;
+  }
 
   if (!parent) {
     throw new Error(`ENOENT: no such file or directory, mkdir '${filePath}'`);
