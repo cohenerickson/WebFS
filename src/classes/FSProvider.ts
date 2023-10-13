@@ -39,7 +39,7 @@ export abstract class FSProvider extends (EventEmitter as new () => TypedEmitter
    * @param id The id of a directory
    * @returns The subtree directory
    */
-  abstract getSubTree(id: string): Promise<Entry<true>>;
+  abstract getSubTree(id: number): Promise<Entry<true>>;
 
   /**
    * Gets an entry from the file system
@@ -49,7 +49,7 @@ export abstract class FSProvider extends (EventEmitter as new () => TypedEmitter
    * @param id The id of the entry
    * @returns The entry or undefined if it doesn't exist
    */
-  abstract getEntry(id: string): Promise<Entry | undefined>;
+  abstract getEntry(id: number): Promise<Entry | undefined>;
 
   /**
    * Finds an entry in the file system

@@ -1,6 +1,6 @@
 import { FileSystem } from "../classes/FileSystem";
+import { randomId } from "../util/randomId";
 import path from "path";
-import { v4 } from "uuid";
 
 export async function link(
   this: FileSystem,
@@ -17,7 +17,7 @@ export async function link(
 
   const newEntry = {
     ...entry,
-    id: v4(),
+    id: randomId(),
     name: path.basename(newPath)
   };
 

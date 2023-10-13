@@ -4,7 +4,7 @@ import { IDBPDatabase, openDB, DBSchema } from "idb";
 
 interface Schema extends DBSchema {
   files: {
-    key: string;
+    key: number;
     value: Uint8Array | Entry;
   };
 }
@@ -22,7 +22,7 @@ export class IDBProvider extends FSProvider {
         db.put(
           "files",
           {
-            id: "00000000-0000-0000-0000-000000000000",
+            id: 0,
             name: "/",
             type: "directory",
             children: [],
@@ -33,7 +33,7 @@ export class IDBProvider extends FSProvider {
             owner: 0,
             group: 0
           },
-          "00000000-0000-0000-0000-000000000000"
+          0
         );
       }
     });
@@ -44,12 +44,10 @@ export class IDBProvider extends FSProvider {
   }
 
   async getTree(): Promise<Directory<true>> {
-    return (await this.getSubTree(
-      "00000000-0000-0000-0000-000000000000"
-    )) as Directory<true>;
+    return (await this.getSubTree(0)) as Directory<true>;
   }
 
-  async getSubTree(id: string): Promise<Entry<true>> {
+  async getSubTree(id: number): Promise<Entry<true>> {
     const db = await this.db!;
 
     const meta = (await db.get("files", id)) as Entry;
@@ -73,7 +71,7 @@ export class IDBProvider extends FSProvider {
     return Object.assign(meta, { children });
   }
 
-  async getEntry(id: string): Promise<Entry | undefined> {
+  async getEntry(id: number): Promise<Entry | undefined> {
     const db = await this.db!;
 
     const entry = await db.get("files", id);
@@ -88,7 +86,7 @@ export class IDBProvider extends FSProvider {
   async findEntry(path: string): Promise<Entry | undefined> {
     const parts = path.split("/");
 
-    let current = await this.getEntry("00000000-0000-0000-0000-000000000000");
+    let current = await this.getEntry(0);
 
     if (!current) return undefined;
 

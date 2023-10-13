@@ -196,7 +196,7 @@ export class FileSystem {
       bigint?: boolean;
     }
   ): Promise<Stats> {
-    return new Stats();
+    return {} as Stats;
   }
 
   async statfs(
@@ -205,7 +205,7 @@ export class FileSystem {
       bigint?: boolean;
     }
   ): Promise<StatFs> {
-    return new StatFs();
+    return {} as StatFs;
   }
 
   async symlink(

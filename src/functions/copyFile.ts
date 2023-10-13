@@ -1,7 +1,7 @@
 import { FileSystem } from "../classes/FileSystem";
 import { constants } from "../util/constants";
+import { randomId } from "../util/randomId";
 import path from "path";
-import { v4 } from "uuid";
 
 export async function copyFile(
   this: FileSystem,
@@ -41,7 +41,7 @@ export async function copyFile(
 
   destFile = {
     ...file,
-    id: destFile?.id ?? v4(),
+    id: destFile?.id ?? randomId(),
     name: destFile?.name ?? path.basename(dest),
     created: destFile?.created ?? new Date(),
     modified: destFile?.modified ?? new Date(),

@@ -1,5 +1,5 @@
 type BaseMeta = {
-  id: string;
+  id: number;
   name: string;
   type: string;
   permissions: number;
@@ -12,17 +12,17 @@ type BaseMeta = {
 
 export type Directory<IsTree extends boolean = false> = BaseMeta & {
   type: "directory";
-  children: IsTree extends true ? Entry<true>[] : string[];
+  children: IsTree extends true ? Entry<true>[] : number[];
 };
 
 export type Symlink = BaseMeta & {
   type: "symlink";
-  target: string;
+  target: number;
 };
 
 export type File = BaseMeta & {
   type: "file";
-  data: string;
+  data: number;
 };
 
 export type Entry<IsTree extends boolean = false> =

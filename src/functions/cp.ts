@@ -1,7 +1,7 @@
 import { FileSystem } from "../classes/FileSystem";
 import { constants } from "../util/constants";
+import { randomId } from "../util/randomId";
 import path from "path";
-import { v4 } from "uuid";
 
 export async function cp(
   this: FileSystem,
@@ -60,7 +60,7 @@ export async function cp(
       if (tree.type === "symlink" && !options?.verbatimSymlinks) {
         let copy = {
           ...tree,
-          id: v4()
+          id: randomId()
         };
 
         if (!options?.preserveTimestamps) {
@@ -76,8 +76,8 @@ export async function cp(
       } else if (tree.type === "file") {
         let copy = {
           ...tree,
-          id: v4(),
-          data: v4()
+          id: randomId(),
+          data: randomId()
         };
 
         if (!options?.preserveTimestamps) {
