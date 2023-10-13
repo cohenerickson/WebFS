@@ -12,8 +12,8 @@ export async function chown(
     throw new Error(`ENOENT: no such file or directory, chown '${path}'`);
   }
 
-  file.owner = uid;
-  file.group = gid;
+  file.uid = uid;
+  file.gid = gid;
 
   await this.provider.setEntry(file);
 }

@@ -3,11 +3,13 @@ type BaseMeta = {
   name: string;
   type: string;
   permissions: number;
+  nlinks: number[];
   created: Date;
   modified: Date;
+  changed: Date;
   accessed: Date;
-  owner: number;
-  group: number;
+  uid: number;
+  gid: number;
 };
 
 export type Directory<IsTree extends boolean = false> = BaseMeta & {

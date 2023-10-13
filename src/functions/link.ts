@@ -21,5 +21,8 @@ export async function link(
     name: path.basename(newPath)
   };
 
+  entry.nlinks.push(newEntry.id);
+  await this.provider.setEntry(entry);
+
   await this.provider.setEntry(newEntry);
 }

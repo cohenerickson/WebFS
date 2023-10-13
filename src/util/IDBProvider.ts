@@ -18,27 +18,29 @@ export class IDBProvider extends FSProvider {
     this.db = openDB<Schema>(name, 1, {
       upgrade: async (db) => {
         db.createObjectStore("files");
-
-        db.put(
-          "files",
-          {
-            id: 0,
-            name: "/",
-            type: "directory",
-            children: [],
-            permissions: 0o777,
-            created: new Date(),
-            modified: new Date(),
-            accessed: new Date(),
-            owner: 0,
-            group: 0
-          },
-          0
-        );
       }
     });
 
-    this.db.then(() => {
+    this.db.then((db) => {
+      db.put(
+        "files",
+        {
+          id: 0,
+          name: "/",
+          type: "directory",
+          children: [],
+          nlinks: [],
+          permissions: 0o777,
+          created: new Date(),
+          modified: new Date(),
+          changed: new Date(),
+          accessed: new Date(),
+          uid: 0,
+          gid: 0
+        },
+        0
+      );
+
       this.emit("ready");
     });
   }

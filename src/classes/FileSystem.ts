@@ -4,6 +4,7 @@ import { chmod } from "../functions/chmod";
 import { chown } from "../functions/chown";
 import { copyFile } from "../functions/copyFile";
 import { cp } from "../functions/cp";
+import { stat } from "../functions/stat";
 import { utimes } from "../functions/utimes";
 import { IDBProvider } from "../util/IDBProvider";
 import { constants } from "../util/constants";
@@ -78,12 +79,7 @@ export class FileSystem {
 
   async link(existingpath: string, newpath: string): Promise<undefined> {}
 
-  async lstat(
-    path: string,
-    options?: {
-      bigint?: boolean;
-    }
-  ): Promise<undefined> {}
+  public lstat = stat.bind(this);
 
   async mkdir(
     path: string,
@@ -190,14 +186,7 @@ export class FileSystem {
     }
   ): Promise<undefined> {}
 
-  async stat(
-    path: string,
-    options?: {
-      bigint?: boolean;
-    }
-  ): Promise<Stats> {
-    return {} as Stats;
-  }
+  public stat = stat.bind(this);
 
   async statfs(
     path: string,
