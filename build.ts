@@ -13,7 +13,7 @@ const ctx = await context({
   target: "esnext",
   format: "iife",
   globalName: "webfs",
-  plugins: [polyfillNode({})]
+  plugins: [polyfillNode()]
 });
 
 if (isDev) {

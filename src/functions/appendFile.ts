@@ -1,8 +1,10 @@
 import { FileSystem } from "../classes/FileSystem";
+import { constants } from "../util/constants";
+import path from "path";
 
 export async function appendFile(
   this: FileSystem,
-  path: string,
+  filePath: string,
   data: string | Uint8Array,
   options:
     | {
@@ -12,14 +14,14 @@ export async function appendFile(
       }
     | string = "utf8"
 ): Promise<undefined> {
-  const file = await this.provider.findEntry(path);
+  const file = await this.provider.findEntry(path.join(this.cwd, filePath));
 
   if (!file)
-    throw new Error(`ENOENT: no such file or directory, open '${path}'`);
+    throw new Error(`ENOENT: no such file or directory, open '${filePath}'`);
 
-  if (file.type !== "file") {
+  if (file.type !== constants.S_IFREG) {
     throw new Error(
-      `EISDIR: illegal operation on a directory, appendFile '${path}'`
+      `EISDIR: illegal operation on a directory, appendFile '${filePath}'`
     );
   }
 
@@ -30,7 +32,9 @@ export async function appendFile(
   const contentBuffer = await this.provider.getContent(file);
 
   if (!contentBuffer) {
-    throw new Error(`ENOENT: no such file or directory, appendFile '${path}'`);
+    throw new Error(
+      `ENOENT: no such file or directory, appendFile '${filePath}'`
+    );
   }
 
   const content = Array.from(contentBuffer);

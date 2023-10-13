@@ -1,7 +1,9 @@
+import { constants } from "./util/constants";
+
 type BaseMeta = {
   id: number;
   name: string;
-  type: string;
+  type: number;
   permissions: number;
   nlinks: number[];
   created: Date;
@@ -13,17 +15,17 @@ type BaseMeta = {
 };
 
 export type Directory<IsTree extends boolean = false> = BaseMeta & {
-  type: "directory";
+  type: typeof constants.S_IFDIR;
   children: IsTree extends true ? Entry<true>[] : number[];
 };
 
 export type Symlink = BaseMeta & {
-  type: "symlink";
+  type: typeof constants.S_IFLNK;
   target: number;
 };
 
 export type File = BaseMeta & {
-  type: "file";
+  type: typeof constants.S_IFREG;
   data: number;
 };
 

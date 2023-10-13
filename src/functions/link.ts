@@ -1,4 +1,5 @@
 import { FileSystem } from "../classes/FileSystem";
+import { constants } from "../util/constants";
 import { randomId } from "../util/randomId";
 import path from "path";
 
@@ -9,7 +10,7 @@ export async function link(
 ) {
   const entry = await this.provider.findEntry(existingPath);
 
-  if (!entry || entry.type !== "file") {
+  if (!entry || entry.type !== constants.S_IFREG) {
     throw new Error(
       `ENOENT: no such file or directory, link '${existingPath}'`
     );

@@ -13,7 +13,7 @@ export async function access(
   if (!entry)
     throw new Error(`ENOENT: no such file or directory, access '${filePath}'`);
 
-  const permissions = getPermissions(entry, this.user, this.group);
+  const permissions = getPermissions(entry, this.uid, this.gid);
 
   switch (mode) {
     case constants.F_OK:

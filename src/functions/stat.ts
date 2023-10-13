@@ -1,5 +1,6 @@
 import { FileSystem } from "../classes/FileSystem";
 import { Stats } from "../classes/Stats";
+import { constants } from "../util/constants";
 
 export async function stat(
   this: FileSystem,
@@ -14,7 +15,7 @@ export async function stat(
     throw new Error(`ENOENT: no such file or directory, stat '${path}'`);
   }
 
-  if (entry.type === "file") {
+  if (entry.type === constants.S_IFREG) {
     const content = await this.provider.getContent(entry);
 
     return new Stats(entry, content ?? null, options?.bigint ?? false);

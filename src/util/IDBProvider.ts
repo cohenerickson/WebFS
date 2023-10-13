@@ -1,5 +1,6 @@
 import { FSProvider } from "../classes/FSProvider";
 import { Directory, Entry, File } from "../types";
+import { constants } from "./constants";
 import { IDBPDatabase, openDB, DBSchema } from "idb";
 
 interface Schema extends DBSchema {
@@ -27,7 +28,7 @@ export class IDBProvider extends FSProvider {
         {
           id: 0,
           name: "/",
-          type: "directory",
+          type: constants.S_IFDIR,
           children: [],
           nlinks: [],
           permissions: 0o777,
@@ -54,7 +55,7 @@ export class IDBProvider extends FSProvider {
 
     const meta = (await db.get("files", id)) as Entry;
 
-    if (meta.type !== "directory") {
+    if (meta.type !== constants.S_IFDIR) {
       return meta;
     }
 
@@ -62,7 +63,7 @@ export class IDBProvider extends FSProvider {
       meta.children.map(async (id) => {
         const meta = (await db.get("files", id)) as Entry;
 
-        if (meta.type === "directory") {
+        if (meta.type === constants.S_IFDIR) {
           return await this.getSubTree(id);
         } else {
           return meta;
@@ -97,7 +98,7 @@ export class IDBProvider extends FSProvider {
         continue;
       }
 
-      if (current.type === "symlink") {
+      if (current.type === constants.S_IFLNK) {
         current = await this.getEntry(current.target);
 
         if (!current) return undefined;
@@ -105,7 +106,7 @@ export class IDBProvider extends FSProvider {
         continue;
       }
 
-      if (current.type !== "directory") {
+      if (current.type !== constants.S_IFDIR) {
         return undefined;
       }
 
@@ -130,7 +131,7 @@ export class IDBProvider extends FSProvider {
   async setEntry(entry: Entry): Promise<void> {
     const db = await this.db!;
 
-    entry.modified = new Date();
+    entry.changed = new Date();
     await db.put("files", entry, entry.id);
 
     this.emit("entry.set", entry);

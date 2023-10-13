@@ -4,6 +4,8 @@ import { chmod } from "../functions/chmod";
 import { chown } from "../functions/chown";
 import { copyFile } from "../functions/copyFile";
 import { cp } from "../functions/cp";
+import { link } from "../functions/link";
+import { mkdir } from "../functions/mkdir";
 import { stat } from "../functions/stat";
 import { utimes } from "../functions/utimes";
 import { IDBProvider } from "../util/IDBProvider";
@@ -18,8 +20,8 @@ import { Stats } from "./Stats";
 export class FileSystem {
   // Internal
   public readonly provider: FSProvider;
-  public readonly user: number;
-  public readonly group: number;
+  public readonly uid: number;
+  public readonly gid: number;
   public readonly cwd: string;
 
   // fs API
@@ -40,8 +42,8 @@ export class FileSystem {
 
     this.provider = options.provider ?? new IDBProvider("sda1");
 
-    this.user = options.user ?? 0;
-    this.group = options.group ?? 0;
+    this.uid = options.user ?? 0;
+    this.gid = options.group ?? 0;
     this.cwd = options.cwd ?? "/";
   }
 
@@ -77,17 +79,11 @@ export class FileSystem {
 
   public lutimes = utimes.bind(this);
 
-  async link(existingpath: string, newpath: string): Promise<undefined> {}
+  public link = link.bind(this);
 
   public lstat = stat.bind(this);
 
-  async mkdir(
-    path: string,
-    options?: {
-      recursive?: boolean;
-      mode?: number;
-    }
-  ): Promise<undefined> {}
+  public mkdir = mkdir.bind(this);
 
   async mkdtemp(
     prefix: string,
