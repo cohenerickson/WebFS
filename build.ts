@@ -1,4 +1,5 @@
 import { context } from "esbuild";
+import { polyfillNode } from "esbuild-plugin-polyfill-node";
 
 const isDev = process.argv.includes("--development");
 
@@ -7,10 +8,12 @@ const ctx = await context({
   outfile: "./dist/index.js",
   bundle: true,
   minify: !isDev,
-  sourcemap: true,
+  sourcemap: !isDev,
   platform: "browser",
   target: "esnext",
-  format: "esm"
+  format: "iife",
+  globalName: "webfs",
+  plugins: [polyfillNode({})]
 });
 
 if (isDev) {

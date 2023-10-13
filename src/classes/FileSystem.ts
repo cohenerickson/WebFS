@@ -1,107 +1,93 @@
-import { DB } from "../util/db";
+import { access } from "../functions/access";
+import { appendFile } from "../functions/appendFile";
+import { chmod } from "../functions/chmod";
+import { chown } from "../functions/chown";
+import { copyFile } from "../functions/copyFile";
+import { cp } from "../functions/cp";
+import { utimes } from "../functions/utimes";
+import { IDBProvider } from "../util/IDBProvider";
+import { constants } from "../util/constants";
 import { Dir } from "./Dir";
 import { Dirent } from "./Dirent";
+import { FSProvider } from "./FSProvider";
 import { FileHandle } from "./FileHandle";
 import { StatFs } from "./StatFs";
 import { Stats } from "./Stats";
 
-type Path = string | URL;
-type Mode = string | number;
-
 export class FileSystem {
-  private db: DB;
-  public readonly constants = {
-    // File access constants
-    F_OK: 0b000,
-    R_OK: 0b100,
-    W_OK: 0b010,
-    X_OK: 0b001,
+  // Internal
+  public readonly provider: FSProvider;
+  public readonly user: number;
+  public readonly group: number;
+  public readonly cwd: string;
 
-    // File copy constants
-    COPYFILE_EXCL: 0b001,
-    COPYFILE_FICLONE: 0b010,
-    COPYFILE_FICLONE_FORCE: 0b100,
+  // fs API
+  public readonly constants = constants;
+  public static readonly Dir = Dir;
+  public static readonly Dirent = Dirent;
+  public static readonly FileHandle = FileHandle;
+  public static readonly StatFs = StatFs;
+  public static readonly Stats = Stats;
 
-    // File open constants
-    O_RDONLY: 0,
-    O_WRONLY: 1,
-    O_RDWR: 2,
-    O_CREAT: 64,
-    O_EXCL: 128,
-    O_NOCTTY: 256,
-    O_TRUNC: 512,
-    O_APPEND: 1024,
-    O_DIRECTORY: 65536,
-    O_NOATIME: 262144,
-    O_NOFOLLOW: 131072,
-    O_SYNC: 1052672,
-    O_DSYNC: 4096,
-    O_SYMLINK: undefined,
-    O_DIRECT: 16384,
-    O_NONBLOCK: 2048,
-    UV_FS_O_FILEMAP: 0
-  } as const;
+  constructor(options?: {
+    provider?: FSProvider;
+    user?: number;
+    group?: number;
+    cwd?: string;
+  }) {
+    options = options ?? {};
 
-  public readonly Dir = Dir;
-  public readonly Dirent = Dirent;
-  public readonly FileHandle = FileHandle;
-  public readonly StatFs = StatFs;
-  public readonly Stats = Stats;
+    this.provider = options.provider ?? new IDBProvider("sda1");
 
-  constructor(name: string) {
-    this.db = new DB(name);
+    this.user = options.user ?? 0;
+    this.group = options.group ?? 0;
+    this.cwd = options.cwd ?? "/";
   }
 
-  async access(
-    path: Path,
-    mode: Mode = this.constants.F_OK
-  ): Promise<undefined> {}
+  /**
+   * Tests a user's permissions for the file or directory specified by `filePath`.
+   * The `mode` argument is an optional integer that specifies the accessibility checks to be performed.
+   * `mode` should be either the value `fs.constants.F_OK` or a mask consisting of the bitwise OR of any of `fs.constants.R_OK`, `fs.constants.W_OK`, and `fs.constants.X_OK` (e.g. `fs.constants.W_OK | fs.constants.R_OK`).
+   * Check [File access constants](https://nodejs.org/api/fs.html#file-access-constants) for possible values of mode.
+   *
+   * @param filePath
+   * @param mode **Default:** `fs.constants.F_OK`
+   *
+   * @returns Fulfills with `undefined` upon success.
+   */
+  public access = access.bind(this);
 
-  async appendFile(
-    path: Path,
-    data: string | Buffer,
-    options:
-      | {
-          encoding?: string | null;
-          mode?: Mode;
-          flag?: string;
-        }
-      | string = "utf8"
-  ): Promise<undefined> {}
+  public appendFile = appendFile.bind(this);
 
-  async chmod(path: Path, mode: Mode): Promise<undefined> {}
+  public chmod = chmod.bind(this);
 
-  async chown(path: Path, uid: number, gid: number): Promise<undefined> {}
+  public chown = chown.bind(this);
 
-  async copyFile(src: Path, dest: Path, mode: Mode = 0): Promise<undefined> {}
+  public copyFile = copyFile.bind(this);
 
   /**
    * @experimental
    */
-  async cp(): Promise<undefined> {}
+  public cp = cp.bind(this);
 
-  async lchmod(path: Path, mode: Mode): Promise<undefined> {}
+  public lchmod = chmod.bind(this);
 
-  async lchown(path: Path, uid: number, gid: number): Promise<undefined> {}
+  public lchown = chown.bind(this);
 
-  async lutimes(
-    path: Path,
-    atime: number | string | Date,
-    mtime: number | string | Date
-  ): Promise<undefined> {}
+  public lutimes = utimes.bind(this);
 
-  async link(existingPath: Path, newPath: Path): Promise<undefined> {}
+  async link(existingpath: string, newpath: string): Promise<undefined> {}
 
   async lstat(
-    path: Path,
-    options: {
+    path: string,
+    options?: {
       bigint?: boolean;
     }
   ): Promise<undefined> {}
 
   async mkdir(
-    path: Path,
-    options: {
+    path: string,
+    options?: {
       recursive?: boolean;
       mode?: number;
     }
@@ -109,20 +95,24 @@ export class FileSystem {
 
   async mkdtemp(
     prefix: string,
-    options:
+    options?:
       | string
       | {
           encoding?: string;
         }
   ): Promise<undefined> {}
 
-  async open(path: Path, flags: string = "r", mode: Mode): Promise<FileHandle> {
+  async open(
+    path: string,
+    flags: string = "r",
+    mode: number
+  ): Promise<FileHandle> {
     return new FileHandle();
   }
 
   async opendir(
-    path: Path,
-    options: {
+    path: string,
+    options?: {
       encoding?: string;
       bufferSize?: number;
       recursive?: boolean;
@@ -132,8 +122,8 @@ export class FileSystem {
   }
 
   async readdir(
-    path: Path,
-    options:
+    path: string,
+    options?:
       | string
       | {
           encoding?: string;
@@ -145,8 +135,8 @@ export class FileSystem {
   }
 
   async readFile(
-    path: Path,
-    options:
+    path: string,
+    options?:
       | string
       | {
           encoding?: string;
@@ -158,8 +148,8 @@ export class FileSystem {
   }
 
   async readlink(
-    path: Path,
-    options:
+    path: string,
+    options?:
       | string
       | {
           encoding?: string;
@@ -169,8 +159,8 @@ export class FileSystem {
   }
 
   async realpath(
-    path: Path,
-    options:
+    path: string,
+    options?:
       | string
       | {
           encoding?: string;
@@ -179,11 +169,11 @@ export class FileSystem {
     return "";
   }
 
-  async rename(oldPath: Path, newPath: Path): Promise<undefined> {}
+  async rename(oldpath: string, newpath: string): Promise<undefined> {}
 
   async rmdir(
-    path: Path,
-    options: {
+    path: string,
+    options?: {
       maxRetries?: number;
       recursive?: boolean;
       retryDelay?: number;
@@ -191,8 +181,8 @@ export class FileSystem {
   ): Promise<undefined> {}
 
   async rm(
-    path: Path,
-    options: {
+    path: string,
+    options?: {
       force?: boolean;
       maxRetries?: number;
       recursive?: boolean;
@@ -201,8 +191,8 @@ export class FileSystem {
   ): Promise<undefined> {}
 
   async stat(
-    path: Path,
-    options: {
+    path: string,
+    options?: {
       bigint?: boolean;
     }
   ): Promise<Stats> {
@@ -210,8 +200,8 @@ export class FileSystem {
   }
 
   async statfs(
-    path: Path,
-    options: {
+    path: string,
+    options?: {
       bigint?: boolean;
     }
   ): Promise<StatFs> {
@@ -219,23 +209,19 @@ export class FileSystem {
   }
 
   async symlink(
-    target: Path,
-    path: Path,
+    target: string,
+    path: string,
     type: string | null = null
   ): Promise<undefined> {}
 
-  async truncate(path: Path, len: number = 0): Promise<undefined> {}
+  async truncate(path: string, len: number = 0): Promise<undefined> {}
 
-  async unlink(path: Path): Promise<undefined> {}
+  async unlink(path: string): Promise<undefined> {}
 
-  async utimes(
-    path: Path,
-    atime: number | string | Date,
-    mtime: number | string | Date
-  ): Promise<undefined> {}
+  public utimes = utimes.bind(this);
 
   async watch(
-    filename: Path,
+    filename: string,
     options?:
       | string
       | {
@@ -254,13 +240,13 @@ export class FileSystem {
   }
 
   async writeFile(
-    path: Path,
+    path: string,
     data: string | Buffer,
-    options:
+    options?:
       | string
       | {
           encoding?: string;
-          mode?: Mode;
+          mode?: number;
           flag?: string;
           signal?: AbortSignal;
         }

@@ -1,29 +1,31 @@
-export type File = {
+type BaseMeta = {
   id: string;
-  path: string;
-  type: "file" | "directory" | "symlink";
+  name: string;
+  type: string;
   permissions: number;
   created: Date;
   modified: Date;
   accessed: Date;
-  owner: string;
-  group: string;
-} & {
-  type: "file" | "symlink";
+  owner: number;
+  group: number;
+};
+
+export type Directory<IsTree extends boolean = false> = BaseMeta & {
+  type: "directory";
+  children: IsTree extends true ? Entry<true>[] : string[];
+};
+
+export type Symlink = BaseMeta & {
+  type: "symlink";
   target: string;
 };
 
-export type User = {
-  id: string;
-  name: string;
-  password: string | null;
-  groups: string[];
-  created: Date;
-  lastLogin: Date;
+export type File = BaseMeta & {
+  type: "file";
+  data: string;
 };
 
-export type Group = {
-  id: string;
-  name: string;
-  created: Date;
-};
+export type Entry<IsTree extends boolean = false> =
+  | Directory<IsTree>
+  | Symlink
+  | File;
