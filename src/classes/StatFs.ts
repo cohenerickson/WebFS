@@ -1,1 +1,3 @@
-export class StatFs {}
+export class StatFs {
+  [Symbol.toStringTag]: "StatFS" = "StatFS";
+}

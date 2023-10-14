@@ -1,7 +1,10 @@
 import { Entry } from "../types";
 import { constants } from "../util/constants";
 
+
 export class Stats {
+  [Symbol.toStringTag]: "Stats" = "Stats";
+
   public readonly dev: bigint | number = 0;
   public readonly ino: bigint | number;
   public readonly mode: bigint | number;

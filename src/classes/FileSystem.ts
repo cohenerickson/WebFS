@@ -10,10 +10,8 @@ import { stat } from "../functions/stat";
 import { utimes } from "../functions/utimes";
 import { IDBProvider } from "../util/IDBProvider";
 import { constants } from "../util/constants";
-import { Dir } from "./Dir";
-import { Dirent } from "./Dirent";
+import { randomSuffix } from "../util/random";
 import { FSProvider } from "./FSProvider";
-import { FileHandle } from "./FileHandle";
 import { StatFs } from "./StatFs";
 import { Stats } from "./Stats";
 
@@ -26,9 +24,6 @@ export class FileSystem {
 
   // fs API
   public readonly constants = constants;
-  public static readonly Dir = Dir;
-  public static readonly Dirent = Dirent;
-  public static readonly FileHandle = FileHandle;
   public static readonly StatFs = StatFs;
   public static readonly Stats = Stats;
 
@@ -92,14 +87,20 @@ export class FileSystem {
       | {
           encoding?: string;
         }
-  ): Promise<undefined> {}
+  ): Promise<undefined> {
+    await mkdir.call(
+      this,
+      `/tmp/${prefix
+        .replace(/[/\/]/g, "")
+        .replace(/-?$/, "-")}${randomSuffix()}`,
+      {
+        recursive: true
+      }
+    );
+  }
 
-  async open(
-    path: string,
-    flags: string = "r",
-    mode: number
-  ): Promise<FileHandle> {
-    return new FileHandle();
+  async open(path: string, flags: string = "r", mode: number): Promise<void> {
+    throw new Error("Not implemented.");
   }
 
   async opendir(
@@ -109,8 +110,8 @@ export class FileSystem {
       bufferSize?: number;
       recursive?: boolean;
     }
-  ): Promise<Dir | AsyncIterable<Dir | FileHandle>> {
-    return new Dir();
+  ): Promise<void | AsyncIterable<void | void>> {
+    throw new Error("Not implemented.");
   }
 
   async readdir(
@@ -122,7 +123,7 @@ export class FileSystem {
           withFileTypes?: boolean;
           recursive?: boolean;
         }
-  ): Promise<string[] | Dirent> {
+  ): Promise<string[] | void> {
     return [];
   }
 
@@ -135,7 +136,7 @@ export class FileSystem {
           flag?: string;
           signal?: AbortSignal;
         }
-  ): Promise<string | Buffer> {
+  ): Promise<string | Uint8Array> {
     return "";
   }
 
@@ -146,7 +147,7 @@ export class FileSystem {
       | {
           encoding?: string;
         }
-  ): Promise<string | Buffer> {
+  ): Promise<string | Uint8Array> {
     return "";
   }
 
@@ -157,7 +158,7 @@ export class FileSystem {
       | {
           encoding?: string;
         }
-  ): Promise<string | Buffer> {
+  ): Promise<string | Uint8Array> {
     return "";
   }
 
@@ -218,7 +219,7 @@ export class FileSystem {
   ): Promise<
     AsyncIterator<{
       eventType: string;
-      filename: string | Buffer;
+      filename: string | Uint8Array;
     }>
   > {
     return {} as any;
@@ -226,7 +227,7 @@ export class FileSystem {
 
   async writeFile(
     path: string,
-    data: string | Buffer,
+    data: string | Uint8Array,
     options?:
       | string
       | {

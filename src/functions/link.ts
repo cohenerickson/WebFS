@@ -1,6 +1,6 @@
 import { FileSystem } from "../classes/FileSystem";
 import { constants } from "../util/constants";
-import { randomId } from "../util/randomId";
+import { randomId } from "../util/random";
 import path from "path";
 
 export async function link(

@@ -1,7 +1,6 @@
 import { FileSystem } from "../classes/FileSystem";
 import path from "path";
 
-
 export async function chown(
   this: FileSystem,
   filePath: string,
